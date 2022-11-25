@@ -86,6 +86,7 @@ function postMessage(channel, sender, data) {
                         payload: JSON.stringify(data.payload || null),
                         sender: sender,
                         createdAt: Date.now(),
+                        isDeleted: false,
                     };
                     return [4 /*yield*/, (0, firestore_1.addDoc)(_collectionRef(channel), message)];
                 case 1:
