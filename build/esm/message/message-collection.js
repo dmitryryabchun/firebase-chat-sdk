@@ -83,6 +83,7 @@ export function postMessage(channel, sender, data) {
                         payload: JSON.stringify(data.payload || null),
                         sender: sender,
                         createdAt: Date.now(),
+                        isDeleted: false,
                     };
                     return [4 /*yield*/, addDoc(_collectionRef(channel), message)];
                 case 1:

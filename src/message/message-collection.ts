@@ -61,6 +61,7 @@ export async function postMessage(channel: ChannelID, sender: UserID, data: IMes
         payload: JSON.stringify(data.payload || null),
         sender: sender,
         createdAt: Date.now(),
+        isDeleted: false,
     };
     const newDoc = await addDoc(_collectionRef(channel), message);
     return messageRecordToChannel(message, newDoc.id);
