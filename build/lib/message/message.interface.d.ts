@@ -8,10 +8,12 @@ export interface IMessageRecord {
     payload: string;
     sender: UserID;
     createdAt: number;
+    isDeleted?: boolean;
 }
 export interface IMessage extends IMessageData {
     id: string;
     sender: UserID;
     createdAt: number;
+    isDeleted?: boolean;
 }
 //# sourceMappingURL=message.interface.d.ts.map

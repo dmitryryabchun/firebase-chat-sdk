@@ -45,7 +45,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.unsubscribeMessage = exports.subscribeMessage = exports.getMessages = exports.postMessage = void 0;
+exports.unsubscribeMessage = exports.subscribeMessage = exports.updateMessage = exports.getMessages = exports.postMessage = void 0;
 var firestore_1 = require("firebase/firestore");
 var firebase_snapshot_utils_1 = require("../_utils/firebase-snapshot.utils");
 function _collectionPath(channelId) {
@@ -72,6 +72,7 @@ function messageRecordToChannel(record, id) {
         payload: payload,
         createdAt: record.createdAt,
         sender: record.sender,
+        isDeleted: (record === null || record === void 0 ? void 0 : record.isDeleted) || false,
     };
 }
 function postMessage(channel, sender, data) {
@@ -123,6 +124,17 @@ function getMessages(channel, take, after) {
     });
 }
 exports.getMessages = getMessages;
+function updateMessage(channel, messageId, changes) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, (0, firestore_1.updateDoc)(_docRef(channel, messageId), changes)];
+                case 1: return [2 /*return*/, _a.sent()];
+            }
+        });
+    });
+}
+exports.updateMessage = updateMessage;
 function subscribeMessage(channelId, callback) {
     return __awaiter(this, void 0, void 0, function () {
         var db;

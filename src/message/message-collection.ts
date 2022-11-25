@@ -13,7 +13,8 @@ import {
     startAfter,
     onSnapshot,
     DocumentData,
-    QuerySnapshot
+    QuerySnapshot,
+    updateDoc
 } from 'firebase/firestore';
 import {IMessage, IMessageData, IMessageRecord} from './message.interface';
 import {ChannelID} from '../channel/channel.interface';
@@ -48,6 +49,7 @@ function messageRecordToChannel(record: IMessageRecord, id: string): IMessage {
         payload: payload,
         createdAt: record.createdAt,
         sender: record.sender,
+        isDeleted: record?.isDeleted || false,
     };
 }
 
@@ -79,6 +81,10 @@ export async function getMessages(channel: ChannelID, take: number = 10, after?:
         messages: docs.map(docWithId).map(doc => messageRecordToChannel(doc, doc.id)),
         next: docs[docs.length - 1],
     };
+}
+
+export async function updateMessage(channel: ChannelID, messageId: string, changes: Partial<IMessageRecord>): Promise<void> {
+    return await updateDoc(_docRef(channel, messageId), changes);
 }
 
 export async function subscribeMessage(channelId: ChannelID, callback: (docs: IMessage[], docsData: QuerySnapshot) => void): Promise<Unsubscribe> {

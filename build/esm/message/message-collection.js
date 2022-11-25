@@ -43,7 +43,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
-import { addDoc, collection, doc, getDocs, getFirestore, limit, orderBy, query, startAfter, onSnapshot } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs, getFirestore, limit, orderBy, query, startAfter, onSnapshot, updateDoc } from 'firebase/firestore';
 import { docWithId } from '../_utils/firebase-snapshot.utils';
 function _collectionPath(channelId) {
     return "/channels/".concat(channelId, "/messages");
@@ -69,6 +69,7 @@ function messageRecordToChannel(record, id) {
         payload: payload,
         createdAt: record.createdAt,
         sender: record.sender,
+        isDeleted: (record === null || record === void 0 ? void 0 : record.isDeleted) || false,
     };
 }
 export function postMessage(channel, sender, data) {
@@ -114,6 +115,16 @@ export function getMessages(channel, take, after) {
                             messages: docs.map(docWithId).map(function (doc) { return messageRecordToChannel(doc, doc.id); }),
                             next: docs[docs.length - 1],
                         }];
+            }
+        });
+    });
+}
+export function updateMessage(channel, messageId, changes) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, updateDoc(_docRef(channel, messageId), changes)];
+                case 1: return [2 /*return*/, _a.sent()];
             }
         });
     });
