@@ -54,6 +54,10 @@ function channelRecordToChannel(record: IChannelRecord, id: ChannelID): IChannel
         payload: payload,
         tags: objectToArray(record.tags),
         members: record.members,
+        isMultiChannel: !!record.isMultiChannel,
+        ...(record.isMultiChannel && {
+            composedChannels: record.composedChannels
+        }),
     };
 }
 
@@ -66,6 +70,10 @@ export async function createChannel(id: ChannelID, data: IChannelData): Promise<
         tags,
         members: [],
         updatedAt: Date.now(),
+        isMultiChannel: !!data.isMultiChannel,
+        ...(data.isMultiChannel && {
+            composedChannels: data.composedChannels
+        }),
     };
     await setDoc(_docRef(id), channel);
     return channelRecordToChannel(channel, id);

@@ -7,6 +7,8 @@ export interface IChannelData {
     title: string;
     payload?: Record<string, any>;
     tags: string[];
+    isMultiChannel?: boolean;
+    composedChannels?: string[];
 }
 
 export interface IChannelRecord {
@@ -15,6 +17,8 @@ export interface IChannelRecord {
     tags: Record<string, boolean>;
     members: UserID[];
     updatedAt: number;
+    isMultiChannel?: boolean;
+    composedChannels?: string[];
 }
 
 export interface IChannel extends IChannelData {
