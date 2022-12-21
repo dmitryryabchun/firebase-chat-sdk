@@ -12,6 +12,7 @@ export interface IChannelData {
 }
 
 export interface IChannelRecord {
+    id?: ChannelID;
     title: string;
     payload: string | null;
     tags: Record<string, boolean>;

@@ -283,16 +283,18 @@ exports.updateUserNameForEachChannel = updateUserNameForEachChannel;
  * @param updatedAt
  * @returns `Promise`
  */
-function updateBatchPartialChannels(props, updatedAt) {
+function updateBatchPartialChannels(records) {
     return __awaiter(this, void 0, void 0, function () {
         var batch;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     batch = batchRef();
-                    props.forEach(function (_ch) {
-                        if (_ch.id) {
-                            batch.update(_docRef(_ch.id), updatedAt ? __assign(__assign({}, props), { updatedAt: updatedAt }) : __assign({}, props));
+                    records.forEach(function (rec) {
+                        if (rec.id && Object.keys(rec).length > 1) {
+                            var docId = rec.id;
+                            delete rec.id;
+                            batch.update(_docRef(docId), __assign({}, rec));
                         }
                     });
                     return [4 /*yield*/, batch.commit()];
