@@ -19,6 +19,13 @@ export declare function findChannelsByUser(userId: UserID, tags?: string[], take
 export declare function getChannelWithMultiChannels(id: ChannelID): Promise<[IChannel, IChannel[]] | null>;
 export declare function getMultiChannelWithComposedChannels(id: ChannelID): Promise<[IChannel, IChannel[]] | null>;
 export declare function updateUserNameForEachChannel(id: UserID, name: string, take?: number): Promise<void>;
+/**
+ * Function for updating multiple channel's docs with partial properties
+ * @param props An array of channels containing the fields and values ​​to be updated in the document
+ * @param updatedAt
+ * @returns `Promise`
+ */
+export declare function updateBatchPartialChannels(props: Partial<IChannel>[], updatedAt?: number): Promise<void>;
 export declare function subscribeChannels(callback: (channels: IChannel[], channelData: QuerySnapshot) => void): Promise<Unsubscribe>;
 export declare function subscribeChannel(channelId: string, callback: (channelData: DocumentSnapshot) => void): Promise<Unsubscribe>;
 export declare function unsubscribeChannel(unsubscribe: Unsubscribe): Promise<void>;

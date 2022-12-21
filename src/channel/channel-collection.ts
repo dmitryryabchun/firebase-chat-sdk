@@ -196,6 +196,22 @@ export async function updateUserNameForEachChannel(id: UserID, name: string, tak
     await batch.commit();
 }
 
+/**
+ * Function for updating multiple channel's docs with partial properties
+ * @param props An array of channels containing the fields and values ​​to be updated in the document
+ * @param updatedAt 
+ * @returns `Promise`
+ */
+export async function updateBatchPartialChannels(props: Partial<IChannel>[], updatedAt?: number): Promise<void> {
+    const batch = batchRef();
+    props.forEach(_ch => {
+      if (_ch.id) {
+        batch.update(_docRef(_ch.id), updatedAt ? { ...props, updatedAt } : { ...props });
+      }
+    });
+    await batch.commit();
+}
+
 async function _findByQuery(queryConstraints: QueryConstraint[]) {
     const q = query(_collectionRef(), ...queryConstraints);
     const docs = await getDocs(q).then(response => response.docs);
