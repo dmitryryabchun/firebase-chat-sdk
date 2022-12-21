@@ -57,6 +57,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 import { collection, doc, getDoc, getDocs, getFirestore, limit, onSnapshot, query, setDoc, startAfter, where, orderBy, writeBatch } from 'firebase/firestore';
 import { docWithId } from '../_utils/firebase-snapshot.utils';
 import { arrayToObject, objectToArray } from '../_utils/array.utils';
+import { documentId } from '@firebase/firestore';
 var _collectionPath = '/channels';
 function _collectionRef() {
     var db = getFirestore();
@@ -162,6 +163,62 @@ export function findChannelsByUser(userId, tags, take, sortByLastUpdate, after) 
                 queryConstraints.push(where("tags.".concat(tag), '==', true));
             }
             return [2 /*return*/, _findByQuery(queryConstraints)];
+        });
+    });
+}
+export function getChannelWithMultiChannels(id) {
+    return __awaiter(this, void 0, void 0, function () {
+        var doc, _channel, _multiChannels;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, getDoc(_docRef(id))];
+                case 1:
+                    doc = _a.sent();
+                    if (!doc.exists()) {
+                        return [2 /*return*/, null];
+                    }
+                    _channel = docWithId(doc);
+                    return [4 /*yield*/, _findByQuery([
+                            where('composedChannels', 'array-contains', doc.id),
+                        ])];
+                case 2:
+                    _multiChannels = _a.sent();
+                    return [2 /*return*/, [
+                            channelRecordToChannel(_channel, doc.id),
+                            _multiChannels.channels
+                        ]];
+            }
+        });
+    });
+}
+export function getMultiChannelWithComposedChannels(id) {
+    return __awaiter(this, void 0, void 0, function () {
+        var doc, multiChannel, composedChannels;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, getDoc(_docRef(id))];
+                case 1:
+                    doc = _a.sent();
+                    if (!doc.exists()) {
+                        return [2 /*return*/, null];
+                    }
+                    multiChannel = docWithId(doc);
+                    if (!multiChannel.composedChannels) {
+                        return [2 /*return*/, [
+                                channelRecordToChannel(multiChannel, doc.id),
+                                []
+                            ]];
+                    }
+                    return [4 /*yield*/, _findByQuery([
+                            where(documentId(), 'in', multiChannel.composedChannels),
+                        ])];
+                case 2:
+                    composedChannels = _a.sent();
+                    return [2 /*return*/, [
+                            channelRecordToChannel(multiChannel, doc.id),
+                            composedChannels.channels
+                        ]];
+            }
         });
     });
 }
