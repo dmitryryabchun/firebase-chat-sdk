@@ -202,11 +202,13 @@ export async function updateUserNameForEachChannel(id: UserID, name: string, tak
  * @param updatedAt 
  * @returns `Promise`
  */
-export async function updateBatchPartialChannels(props: Partial<IChannel>[], updatedAt?: number): Promise<void> {
+export async function updateBatchPartialChannels(records: Partial<IChannelRecord>[]): Promise<void> {
     const batch = batchRef();
-    props.forEach(_ch => {
-      if (_ch.id) {
-        batch.update(_docRef(_ch.id), updatedAt ? { ...props, updatedAt } : { ...props });
+    records.forEach(rec => {
+      if (rec.id && Object.keys(rec).length > 1) {
+        const docId = rec.id;
+        delete rec.id;
+        batch.update(_docRef(docId), { ...rec });
       }
     });
     await batch.commit();

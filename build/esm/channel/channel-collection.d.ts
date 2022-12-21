@@ -1,5 +1,5 @@
 import { DocumentReference, DocumentSnapshot, QuerySnapshot } from 'firebase/firestore';
-import { ChannelID, IChannel, IChannelData } from './channel.interface';
+import { ChannelID, IChannel, IChannelData, IChannelRecord } from './channel.interface';
 import { UserID } from '../user/user.interface';
 import firebase from 'firebase/compat';
 import Unsubscribe = firebase.Unsubscribe;
@@ -25,7 +25,7 @@ export declare function updateUserNameForEachChannel(id: UserID, name: string, t
  * @param updatedAt
  * @returns `Promise`
  */
-export declare function updateBatchPartialChannels(props: Partial<IChannel>[], updatedAt?: number): Promise<void>;
+export declare function updateBatchPartialChannels(records: Partial<IChannelRecord>[]): Promise<void>;
 export declare function subscribeChannels(callback: (channels: IChannel[], channelData: QuerySnapshot) => void): Promise<Unsubscribe>;
 export declare function subscribeChannel(channelId: string, callback: (channelData: DocumentSnapshot) => void): Promise<Unsubscribe>;
 export declare function unsubscribeChannel(unsubscribe: Unsubscribe): Promise<void>;
