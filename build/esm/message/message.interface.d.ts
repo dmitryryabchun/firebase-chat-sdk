@@ -1,3 +1,4 @@
+import { IChannelMember } from '../channel/channel.interface';
 import { UserID } from '../user/user.interface';
 export interface IMessageData {
     message: string;
@@ -15,5 +16,12 @@ export interface IMessage extends IMessageData {
     sender: UserID;
     createdAt: number;
     isDeleted?: boolean;
+}
+export interface IChannelLastMessage {
+    createdAt: number;
+    id: string;
+    message: string;
+    sender: IChannelMember;
+    isSelfMessage: boolean;
 }
 //# sourceMappingURL=message.interface.d.ts.map

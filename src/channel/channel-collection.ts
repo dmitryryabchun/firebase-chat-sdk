@@ -17,13 +17,14 @@ import {
   orderBy,
   writeBatch
 } from 'firebase/firestore';
-import { ChannelID, IChannel, IChannelData, IChannelRecord } from './channel.interface';
+import { ChannelID, IChannel, IChannelData, IChannelMember, IChannelRecord } from './channel.interface';
 import { docWithId } from '../_utils/firebase-snapshot.utils';
 import { UserID } from '../user/user.interface';
 import { arrayToObject, objectToArray } from '../_utils/array.utils';
 import firebase from 'firebase/compat';
 import Unsubscribe = firebase.Unsubscribe;
 import { documentId, WriteBatch } from '@firebase/firestore';
+import { IChannelLastMessage } from '../message/message.interface';
 
 const _collectionPath = '/channels';
 
@@ -163,8 +164,37 @@ export async function getMultiChannelWithComposedChannels(id: ChannelID): Promis
         channelRecordToChannel(multiChannel, doc.id),
         composedChannels.channels
     ];
-  }
+}
 
+export async function updateUserNameForEachChannel(id: UserID, name: string, take = 1000): Promise<void> {
+    const batch = batchRef();
+    const queryConstraints = [
+        where('members', 'array-contains', id),
+        limit(take),
+    ];
+    const channels = await _findByQuery(queryConstraints);
+    if(!channels.channels.length){
+        return;
+    }
+    channels.channels.forEach((channel) => {
+        if (channel && channel.payload && Object.keys(channel.payload).length !== 0) {
+            const _members = channel.payload.members as IChannelMember[];
+            const targetUserIndx = _members.findIndex(m => Number(m.id) === Number(id));
+            if (targetUserIndx === -1) {
+              return;
+            }
+            _members[targetUserIndx].name = name;
+            const _lastMessage = channel.payload.lastMessage ? <IChannelLastMessage>channel.payload.lastMessage : null;
+            if (_lastMessage && _lastMessage.sender && Number(_lastMessage.sender.id) === Number(id)) {
+              _lastMessage.sender.name = name;
+            }
+            batch.update(_docRef(channel.id), {
+                payload: JSON.stringify(channel.payload)
+            });
+        }
+    })
+    await batch.commit();
+}
 
 async function _findByQuery(queryConstraints: QueryConstraint[]) {
     const q = query(_collectionRef(), ...queryConstraints);

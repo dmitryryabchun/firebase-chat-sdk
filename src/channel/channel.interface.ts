@@ -25,3 +25,11 @@ export interface IChannel extends IChannelData {
     id: ChannelID;
     members: UserID[];
 }
+
+export interface IChannelMember {
+    id: string;
+    name: string;
+    type: 'admin' | 'primary_owner' | 'member';
+    unread: boolean;
+    unreadMessageCounter?: number,
+}

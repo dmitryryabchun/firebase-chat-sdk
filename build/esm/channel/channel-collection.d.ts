@@ -18,6 +18,7 @@ export declare function findChannelsByUser(userId: UserID, tags?: string[], take
 }>;
 export declare function getChannelWithMultiChannels(id: ChannelID): Promise<[IChannel, IChannel[]] | null>;
 export declare function getMultiChannelWithComposedChannels(id: ChannelID): Promise<[IChannel, IChannel[]] | null>;
+export declare function updateUserNameForEachChannel(id: UserID, name: string, take?: number): Promise<void>;
 export declare function subscribeChannels(callback: (channels: IChannel[], channelData: QuerySnapshot) => void): Promise<Unsubscribe>;
 export declare function subscribeChannel(channelId: string, callback: (channelData: DocumentSnapshot) => void): Promise<Unsubscribe>;
 export declare function unsubscribeChannel(unsubscribe: Unsubscribe): Promise<void>;
