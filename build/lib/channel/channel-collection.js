@@ -56,10 +56,11 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.unsubscribeChannel = exports.subscribeChannel = exports.subscribeChannels = exports.findChannelsByUser = exports.findChannelsByTags = exports.getChannel = exports.createChannel = exports.batchRef = exports._docRef = void 0;
+exports.unsubscribeChannel = exports.subscribeChannel = exports.subscribeChannels = exports.getMultiChannelWithComposedChannels = exports.getChannelWithMultiChannels = exports.findChannelsByUser = exports.findChannelsByTags = exports.getChannel = exports.createChannel = exports.batchRef = exports._docRef = void 0;
 var firestore_1 = require("firebase/firestore");
 var firebase_snapshot_utils_1 = require("../_utils/firebase-snapshot.utils");
 var array_utils_1 = require("../_utils/array.utils");
+var firestore_2 = require("@firebase/firestore");
 var _collectionPath = '/channels';
 function _collectionRef() {
     var db = (0, firestore_1.getFirestore)();
@@ -174,6 +175,64 @@ function findChannelsByUser(userId, tags, take, sortByLastUpdate, after) {
     });
 }
 exports.findChannelsByUser = findChannelsByUser;
+function getChannelWithMultiChannels(id) {
+    return __awaiter(this, void 0, void 0, function () {
+        var doc, _channel, _multiChannels;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, (0, firestore_1.getDoc)(_docRef(id))];
+                case 1:
+                    doc = _a.sent();
+                    if (!doc.exists()) {
+                        return [2 /*return*/, null];
+                    }
+                    _channel = (0, firebase_snapshot_utils_1.docWithId)(doc);
+                    return [4 /*yield*/, _findByQuery([
+                            (0, firestore_1.where)('composedChannels', 'array-contains', doc.id),
+                        ])];
+                case 2:
+                    _multiChannels = _a.sent();
+                    return [2 /*return*/, [
+                            channelRecordToChannel(_channel, doc.id),
+                            _multiChannels.channels
+                        ]];
+            }
+        });
+    });
+}
+exports.getChannelWithMultiChannels = getChannelWithMultiChannels;
+function getMultiChannelWithComposedChannels(id) {
+    return __awaiter(this, void 0, void 0, function () {
+        var doc, multiChannel, composedChannels;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, (0, firestore_1.getDoc)(_docRef(id))];
+                case 1:
+                    doc = _a.sent();
+                    if (!doc.exists()) {
+                        return [2 /*return*/, null];
+                    }
+                    multiChannel = (0, firebase_snapshot_utils_1.docWithId)(doc);
+                    if (!multiChannel.composedChannels) {
+                        return [2 /*return*/, [
+                                channelRecordToChannel(multiChannel, doc.id),
+                                []
+                            ]];
+                    }
+                    return [4 /*yield*/, _findByQuery([
+                            (0, firestore_1.where)((0, firestore_2.documentId)(), 'in', multiChannel.composedChannels),
+                        ])];
+                case 2:
+                    composedChannels = _a.sent();
+                    return [2 /*return*/, [
+                            channelRecordToChannel(multiChannel, doc.id),
+                            composedChannels.channels
+                        ]];
+            }
+        });
+    });
+}
+exports.getMultiChannelWithComposedChannels = getMultiChannelWithComposedChannels;
 function _findByQuery(queryConstraints) {
     return __awaiter(this, void 0, void 0, function () {
         var q, docs;

@@ -23,7 +23,7 @@ import { UserID } from '../user/user.interface';
 import { arrayToObject, objectToArray } from '../_utils/array.utils';
 import firebase from 'firebase/compat';
 import Unsubscribe = firebase.Unsubscribe;
-import { WriteBatch } from '@firebase/firestore';
+import { documentId, WriteBatch } from '@firebase/firestore';
 
 const _collectionPath = '/channels';
 
@@ -128,6 +128,42 @@ export async function findChannelsByUser(userId: UserID, tags: string[] = [], ta
     }
     return _findByQuery(queryConstraints);
 }
+
+export async function getChannelWithMultiChannels(id: ChannelID): Promise<[IChannel, IChannel[]] | null> {
+    const doc = await getDoc(_docRef(id));
+    if (!doc.exists()) {
+        return null;
+    }
+    const _channel: IChannelRecord = docWithId(doc);
+    const _multiChannels = await _findByQuery([
+        where('composedChannels', 'array-contains', doc.id),
+    ]);
+    return [
+        channelRecordToChannel(_channel, doc.id),
+        _multiChannels.channels
+    ];
+}
+
+export async function getMultiChannelWithComposedChannels(id: ChannelID): Promise<[IChannel, IChannel[]] | null> {
+    const doc = await getDoc(_docRef(id));
+    if (!doc.exists()) {
+        return null;
+    }
+    const multiChannel: IChannelRecord = docWithId(doc);
+    if (!multiChannel.composedChannels) {
+        return [
+            channelRecordToChannel(multiChannel, doc.id),
+            []
+        ]
+    }
+    const composedChannels = await _findByQuery([
+        where(documentId(), 'in', multiChannel.composedChannels),
+    ]);
+    return [
+        channelRecordToChannel(multiChannel, doc.id),
+        composedChannels.channels
+    ];
+  }
 
 
 async function _findByQuery(queryConstraints: QueryConstraint[]) {
