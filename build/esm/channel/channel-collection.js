@@ -222,6 +222,49 @@ export function getMultiChannelWithComposedChannels(id) {
         });
     });
 }
+export function updateUserNameForEachChannel(id, name, take) {
+    if (take === void 0) { take = 1000; }
+    return __awaiter(this, void 0, void 0, function () {
+        var batch, queryConstraints, channels;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    batch = batchRef();
+                    queryConstraints = [
+                        where('members', 'array-contains', id),
+                        limit(take),
+                    ];
+                    return [4 /*yield*/, _findByQuery(queryConstraints)];
+                case 1:
+                    channels = _a.sent();
+                    if (!channels.channels.length) {
+                        return [2 /*return*/];
+                    }
+                    channels.channels.forEach(function (channel) {
+                        if (channel && channel.payload && Object.keys(channel.payload).length !== 0) {
+                            var _members = channel.payload.members;
+                            var targetUserIndx = _members.findIndex(function (m) { return Number(m.id) === Number(id); });
+                            if (targetUserIndx === -1) {
+                                return;
+                            }
+                            _members[targetUserIndx].name = name;
+                            var _lastMessage = channel.payload.lastMessage ? channel.payload.lastMessage : null;
+                            if (_lastMessage && _lastMessage.sender && Number(_lastMessage.sender.id) === Number(id)) {
+                                _lastMessage.sender.name = name;
+                            }
+                            batch.update(_docRef(channel.id), {
+                                payload: JSON.stringify(channel.payload)
+                            });
+                        }
+                    });
+                    return [4 /*yield*/, batch.commit()];
+                case 2:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
 function _findByQuery(queryConstraints) {
     return __awaiter(this, void 0, void 0, function () {
         var q, docs;
