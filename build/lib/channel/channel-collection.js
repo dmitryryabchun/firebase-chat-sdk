@@ -56,7 +56,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.unsubscribeChannel = exports.subscribeChannel = exports.subscribeChannels = exports.updateUserNameForEachChannel = exports.getMultiChannelWithComposedChannels = exports.getChannelWithMultiChannels = exports.findChannelsByUser = exports.findChannelsByTags = exports.getChannel = exports.createChannel = exports.batchRef = exports._docRef = void 0;
+exports.unsubscribeChannel = exports.subscribeChannel = exports.subscribeChannels = exports.updateBatchPartialChannels = exports.updateUserNameForEachChannel = exports.getMultiChannelWithComposedChannels = exports.getChannelWithMultiChannels = exports.findChannelsByUser = exports.findChannelsByTags = exports.getChannel = exports.createChannel = exports.batchRef = exports._docRef = void 0;
 var firestore_1 = require("firebase/firestore");
 var firebase_snapshot_utils_1 = require("../_utils/firebase-snapshot.utils");
 var array_utils_1 = require("../_utils/array.utils");
@@ -277,6 +277,33 @@ function updateUserNameForEachChannel(id, name, take) {
     });
 }
 exports.updateUserNameForEachChannel = updateUserNameForEachChannel;
+/**
+ * Function for updating multiple channel's docs with partial properties
+ * @param props An array of channels containing the fields and values ​​to be updated in the document
+ * @param updatedAt
+ * @returns `Promise`
+ */
+function updateBatchPartialChannels(props, updatedAt) {
+    return __awaiter(this, void 0, void 0, function () {
+        var batch;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    batch = batchRef();
+                    props.forEach(function (_ch) {
+                        if (_ch.id) {
+                            batch.update(_docRef(_ch.id), updatedAt ? __assign(__assign({}, props), { updatedAt: updatedAt }) : __assign({}, props));
+                        }
+                    });
+                    return [4 /*yield*/, batch.commit()];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.updateBatchPartialChannels = updateBatchPartialChannels;
 function _findByQuery(queryConstraints) {
     return __awaiter(this, void 0, void 0, function () {
         var q, docs;

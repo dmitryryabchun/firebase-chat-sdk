@@ -265,6 +265,32 @@ export function updateUserNameForEachChannel(id, name, take) {
         });
     });
 }
+/**
+ * Function for updating multiple channel's docs with partial properties
+ * @param props An array of channels containing the fields and values ​​to be updated in the document
+ * @param updatedAt
+ * @returns `Promise`
+ */
+export function updateBatchPartialChannels(props, updatedAt) {
+    return __awaiter(this, void 0, void 0, function () {
+        var batch;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    batch = batchRef();
+                    props.forEach(function (_ch) {
+                        if (_ch.id) {
+                            batch.update(_docRef(_ch.id), updatedAt ? __assign(__assign({}, props), { updatedAt: updatedAt }) : __assign({}, props));
+                        }
+                    });
+                    return [4 /*yield*/, batch.commit()];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
 function _findByQuery(queryConstraints) {
     return __awaiter(this, void 0, void 0, function () {
         var q, docs;
