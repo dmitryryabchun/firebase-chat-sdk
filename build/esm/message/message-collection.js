@@ -43,7 +43,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
-import { addDoc, collection, doc, getDocs, getFirestore, limit, orderBy, query, startAfter, onSnapshot, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs, getFirestore, limit, orderBy, query, startAfter, onSnapshot, updateDoc, setDoc } from 'firebase/firestore';
 import { docWithId } from '../_utils/firebase-snapshot.utils';
 function _collectionPath(channelId) {
     return "/channels/".concat(channelId, "/messages");
@@ -72,7 +72,7 @@ function messageRecordToChannel(record, id) {
         isDeleted: (record === null || record === void 0 ? void 0 : record.isDeleted) || false,
     };
 }
-export function postMessage(channel, sender, data) {
+export function postMessage(channel, sender, data, messageId) {
     return __awaiter(this, void 0, void 0, function () {
         var message, newDoc;
         return __generator(this, function (_a) {
@@ -85,8 +85,13 @@ export function postMessage(channel, sender, data) {
                         createdAt: Date.now(),
                         isDeleted: false,
                     };
-                    return [4 /*yield*/, addDoc(_collectionRef(channel), message)];
+                    if (!messageId) return [3 /*break*/, 2];
+                    return [4 /*yield*/, setDoc(doc(getFirestore(), _collectionPath(channel), messageId), message)];
                 case 1:
+                    _a.sent();
+                    return [2 /*return*/, messageRecordToChannel(message, messageId)];
+                case 2: return [4 /*yield*/, addDoc(_collectionRef(channel), message)];
+                case 3:
                     newDoc = _a.sent();
                     return [2 /*return*/, messageRecordToChannel(message, newDoc.id)];
             }
