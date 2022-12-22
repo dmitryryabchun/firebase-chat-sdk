@@ -14,7 +14,8 @@ import {
     onSnapshot,
     DocumentData,
     QuerySnapshot,
-    updateDoc
+    updateDoc,
+    setDoc
 } from 'firebase/firestore';
 import {IMessage, IMessageData, IMessageRecord} from './message.interface';
 import {ChannelID} from '../channel/channel.interface';
@@ -53,7 +54,7 @@ function messageRecordToChannel(record: IMessageRecord, id: string): IMessage {
     };
 }
 
-export async function postMessage(channel: ChannelID, sender: UserID, data: IMessageData): Promise<IMessage> {
+export async function postMessage(channel: ChannelID, sender: UserID, data: IMessageData, messageId?: string): Promise<IMessage> {
     // TODO: Check if channel exists
     // TODO: Check if sender is a channel member
     const message: IMessageRecord = {
@@ -63,8 +64,13 @@ export async function postMessage(channel: ChannelID, sender: UserID, data: IMes
         createdAt: Date.now(),
         isDeleted: false,
     };
-    const newDoc = await addDoc(_collectionRef(channel), message);
-    return messageRecordToChannel(message, newDoc.id);
+    if (messageId) {
+        await setDoc(doc(getFirestore(), _collectionPath(channel), messageId), message);
+        return messageRecordToChannel(message, messageId);
+    } else {
+        const newDoc = await addDoc(_collectionRef(channel), message);
+        return messageRecordToChannel(message, newDoc.id);
+    }
 }
 
 export async function getMessages(channel: ChannelID, take: number = 10, after?: DocumentSnapshot) {

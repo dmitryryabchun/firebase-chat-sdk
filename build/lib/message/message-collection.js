@@ -75,7 +75,7 @@ function messageRecordToChannel(record, id) {
         isDeleted: (record === null || record === void 0 ? void 0 : record.isDeleted) || false,
     };
 }
-function postMessage(channel, sender, data) {
+function postMessage(channel, sender, data, messageId) {
     return __awaiter(this, void 0, void 0, function () {
         var message, newDoc;
         return __generator(this, function (_a) {
@@ -88,8 +88,13 @@ function postMessage(channel, sender, data) {
                         createdAt: Date.now(),
                         isDeleted: false,
                     };
-                    return [4 /*yield*/, (0, firestore_1.addDoc)(_collectionRef(channel), message)];
+                    if (!messageId) return [3 /*break*/, 2];
+                    return [4 /*yield*/, (0, firestore_1.setDoc)((0, firestore_1.doc)((0, firestore_1.getFirestore)(), _collectionPath(channel), messageId), message)];
                 case 1:
+                    _a.sent();
+                    return [2 /*return*/, messageRecordToChannel(message, messageId)];
+                case 2: return [4 /*yield*/, (0, firestore_1.addDoc)(_collectionRef(channel), message)];
+                case 3:
                     newDoc = _a.sent();
                     return [2 /*return*/, messageRecordToChannel(message, newDoc.id)];
             }
