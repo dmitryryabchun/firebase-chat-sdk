@@ -57,7 +57,6 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 import { collection, doc, getDoc, getDocs, getFirestore, limit, onSnapshot, query, setDoc, startAfter, where, orderBy, writeBatch } from 'firebase/firestore';
 import { docWithId } from '../_utils/firebase-snapshot.utils';
 import { arrayToObject, objectToArray } from '../_utils/array.utils';
-import { documentId } from '@firebase/firestore';
 var _collectionPath = '/channels';
 function _collectionRef() {
     var db = getFirestore();
@@ -193,7 +192,7 @@ export function getChannelWithMultiChannels(id) {
 }
 export function getMultiChannelWithComposedChannels(id) {
     return __awaiter(this, void 0, void 0, function () {
-        var doc, multiChannel, composedChannels;
+        var doc, multiChannel, composedChannelsPromises;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, getDoc(_docRef(id))];
@@ -209,15 +208,16 @@ export function getMultiChannelWithComposedChannels(id) {
                                 []
                             ]];
                     }
-                    return [4 /*yield*/, _findByQuery([
-                            where(documentId(), 'in', multiChannel.composedChannels),
-                        ])];
-                case 2:
-                    composedChannels = _a.sent();
-                    return [2 /*return*/, [
-                            channelRecordToChannel(multiChannel, doc.id),
-                            composedChannels.channels
-                        ]];
+                    composedChannelsPromises = [];
+                    multiChannel.composedChannels.forEach(function (_id) {
+                        composedChannelsPromises.push(getDoc(_docRef(_id)));
+                    });
+                    return [2 /*return*/, Promise.all(composedChannelsPromises).then(function (list) {
+                            return [
+                                channelRecordToChannel(multiChannel, doc.id),
+                                list.filter(function (ch) { return ch.exists(); }).map(function (ch) { return channelRecordToChannel(docWithId(ch), ch.id); })
+                            ];
+                        })];
             }
         });
     });

@@ -3,18 +3,18 @@ import { ChannelID, IChannel, IChannelData, IChannelRecord } from './channel.int
 import { UserID } from '../user/user.interface';
 import firebase from 'firebase/compat';
 import Unsubscribe = firebase.Unsubscribe;
-import { WriteBatch } from '@firebase/firestore';
+import { DocumentData, WriteBatch } from '@firebase/firestore';
 export declare function _docRef(id: ChannelID): DocumentReference;
 export declare function batchRef(): WriteBatch;
 export declare function createChannel(id: ChannelID, data: IChannelData): Promise<IChannel>;
 export declare function getChannel(id: ChannelID): Promise<IChannel | null>;
 export declare function findChannelsByTags(tags?: string[], take?: number, sortByLastUpdate?: boolean, after?: DocumentSnapshot): Promise<{
     channels: IChannel[];
-    next: import("@firebase/firestore").QueryDocumentSnapshot<import("@firebase/firestore").DocumentData>;
+    next: import("@firebase/firestore").QueryDocumentSnapshot<DocumentData>;
 }>;
 export declare function findChannelsByUser(userId: UserID, tags?: string[], take?: number, sortByLastUpdate?: boolean, after?: DocumentSnapshot): Promise<{
     channels: IChannel[];
-    next: import("@firebase/firestore").QueryDocumentSnapshot<import("@firebase/firestore").DocumentData>;
+    next: import("@firebase/firestore").QueryDocumentSnapshot<DocumentData>;
 }>;
 export declare function getChannelWithMultiChannels(id: ChannelID): Promise<[IChannel, IChannel[]] | null>;
 export declare function getMultiChannelWithComposedChannels(id: ChannelID): Promise<[IChannel, IChannel[]] | null>;

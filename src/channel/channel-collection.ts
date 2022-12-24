@@ -23,7 +23,7 @@ import { UserID } from '../user/user.interface';
 import { arrayToObject, objectToArray } from '../_utils/array.utils';
 import firebase from 'firebase/compat';
 import Unsubscribe = firebase.Unsubscribe;
-import { documentId, WriteBatch } from '@firebase/firestore';
+import { DocumentData, WriteBatch } from '@firebase/firestore';
 import { IChannelLastMessage } from '../message/message.interface';
 
 const _collectionPath = '/channels';
@@ -157,13 +157,16 @@ export async function getMultiChannelWithComposedChannels(id: ChannelID): Promis
             []
         ]
     }
-    const composedChannels = await _findByQuery([
-        where(documentId(), 'in', multiChannel.composedChannels),
-    ]);
-    return [
-        channelRecordToChannel(multiChannel, doc.id),
-        composedChannels.channels
-    ];
+    let composedChannelsPromises: Promise<DocumentSnapshot<DocumentData>>[] = []
+    multiChannel.composedChannels.forEach(_id => {
+        composedChannelsPromises.push(getDoc(_docRef(_id)));
+    })
+    return Promise.all(composedChannelsPromises).then(list => {
+        return [
+            channelRecordToChannel(multiChannel, doc.id),
+            list.filter(ch => ch.exists()).map(ch => channelRecordToChannel(docWithId(ch), ch.id) )
+        ];
+    });
 }
 
 export async function updateUserNameForEachChannel(id: UserID, name: string, take = 1000): Promise<void> {
