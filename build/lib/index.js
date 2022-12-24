@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateMessage = exports.unsubscribeMessage = exports.subscribeMessage = exports.getMessages = exports.postMessage = exports.unsubscribeChannel = exports.subscribeChannel = exports.subscribeChannels = exports.findChannelsByUser = exports.findChannelsByTags = exports.getChannel = exports.createChannel = exports.updateChannelFull = exports.updateChannel = exports.removeUserFromChannel = exports.addUserToChannel = exports.unsubscribeUser = exports.subscribeUser = exports.connectUser = exports.initChatApp = void 0;
+exports.updateMessage = exports.unsubscribeMessage = exports.subscribeMessage = exports.getMessages = exports.postMessage = exports.updateUserNameForEachChannel = exports.updateBatchPartialChannels = exports.getMultiChannelWithComposedChannels = exports.getChannelWithMultiChannels = exports.unsubscribeChannel = exports.subscribeChannel = exports.subscribeChannels = exports.findChannelsByUser = exports.findChannelsByTags = exports.getChannel = exports.createChannel = exports.updateChannelFull = exports.updateChannel = exports.removeUserFromChannel = exports.addUserToChannel = exports.unsubscribeUser = exports.subscribeUser = exports.connectUser = exports.initChatApp = void 0;
 var chat_app_1 = require("./chat-app");
 Object.defineProperty(exports, "initChatApp", { enumerable: true, get: function () { return chat_app_1.initChatApp; } });
 var user_1 = require("./user/user");
@@ -21,6 +21,10 @@ Object.defineProperty(exports, "findChannelsByUser", { enumerable: true, get: fu
 Object.defineProperty(exports, "subscribeChannels", { enumerable: true, get: function () { return channel_collection_1.subscribeChannels; } });
 Object.defineProperty(exports, "subscribeChannel", { enumerable: true, get: function () { return channel_collection_1.subscribeChannel; } });
 Object.defineProperty(exports, "unsubscribeChannel", { enumerable: true, get: function () { return channel_collection_1.unsubscribeChannel; } });
+Object.defineProperty(exports, "getChannelWithMultiChannels", { enumerable: true, get: function () { return channel_collection_1.getChannelWithMultiChannels; } });
+Object.defineProperty(exports, "getMultiChannelWithComposedChannels", { enumerable: true, get: function () { return channel_collection_1.getMultiChannelWithComposedChannels; } });
+Object.defineProperty(exports, "updateBatchPartialChannels", { enumerable: true, get: function () { return channel_collection_1.updateBatchPartialChannels; } });
+Object.defineProperty(exports, "updateUserNameForEachChannel", { enumerable: true, get: function () { return channel_collection_1.updateUserNameForEachChannel; } });
 var message_collection_1 = require("./message/message-collection");
 Object.defineProperty(exports, "postMessage", { enumerable: true, get: function () { return message_collection_1.postMessage; } });
 Object.defineProperty(exports, "getMessages", { enumerable: true, get: function () { return message_collection_1.getMessages; } });

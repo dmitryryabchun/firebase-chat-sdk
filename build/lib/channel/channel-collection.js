@@ -60,7 +60,6 @@ exports.unsubscribeChannel = exports.subscribeChannel = exports.subscribeChannel
 var firestore_1 = require("firebase/firestore");
 var firebase_snapshot_utils_1 = require("../_utils/firebase-snapshot.utils");
 var array_utils_1 = require("../_utils/array.utils");
-var firestore_2 = require("@firebase/firestore");
 var _collectionPath = '/channels';
 function _collectionRef() {
     var db = (0, firestore_1.getFirestore)();
@@ -203,7 +202,7 @@ function getChannelWithMultiChannels(id) {
 exports.getChannelWithMultiChannels = getChannelWithMultiChannels;
 function getMultiChannelWithComposedChannels(id) {
     return __awaiter(this, void 0, void 0, function () {
-        var doc, multiChannel, composedChannels;
+        var doc, multiChannel, composedChannelsPromises;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, (0, firestore_1.getDoc)(_docRef(id))];
@@ -219,15 +218,16 @@ function getMultiChannelWithComposedChannels(id) {
                                 []
                             ]];
                     }
-                    return [4 /*yield*/, _findByQuery([
-                            (0, firestore_1.where)((0, firestore_2.documentId)(), 'in', multiChannel.composedChannels),
-                        ])];
-                case 2:
-                    composedChannels = _a.sent();
-                    return [2 /*return*/, [
-                            channelRecordToChannel(multiChannel, doc.id),
-                            composedChannels.channels
-                        ]];
+                    composedChannelsPromises = [];
+                    multiChannel.composedChannels.forEach(function (_id) {
+                        composedChannelsPromises.push((0, firestore_1.getDoc)(_docRef(_id)));
+                    });
+                    return [2 /*return*/, Promise.all(composedChannelsPromises).then(function (list) {
+                            return [
+                                channelRecordToChannel(multiChannel, doc.id),
+                                list.filter(function (ch) { return ch.exists(); }).map(function (ch) { return channelRecordToChannel((0, firebase_snapshot_utils_1.docWithId)(ch), ch.id); })
+                            ];
+                        })];
             }
         });
     });
