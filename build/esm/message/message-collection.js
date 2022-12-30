@@ -70,6 +70,7 @@ function messageRecordToChannel(record, id) {
         createdAt: record.createdAt,
         sender: record.sender,
         isDeleted: (record === null || record === void 0 ? void 0 : record.isDeleted) || false,
+        tags: record.tags || [],
     };
 }
 export function postMessage(channel, sender, data, messageId) {
@@ -84,6 +85,7 @@ export function postMessage(channel, sender, data, messageId) {
                         sender: sender,
                         createdAt: Date.now(),
                         isDeleted: false,
+                        tags: data.tags || [],
                     };
                     if (!messageId) return [3 /*break*/, 2];
                     return [4 /*yield*/, setDoc(doc(getFirestore(), _collectionPath(channel), messageId), message)];

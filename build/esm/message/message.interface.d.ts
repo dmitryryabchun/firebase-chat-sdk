@@ -3,6 +3,7 @@ import { UserID } from '../user/user.interface';
 export interface IMessageData {
     message: string;
     payload?: Record<string, any>;
+    tags: string[];
 }
 export interface IMessageRecord {
     message: string;
@@ -10,6 +11,7 @@ export interface IMessageRecord {
     sender: UserID;
     createdAt: number;
     isDeleted?: boolean;
+    tags: string[];
 }
 export interface IMessage extends IMessageData {
     id: string;

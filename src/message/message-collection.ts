@@ -51,6 +51,7 @@ function messageRecordToChannel(record: IMessageRecord, id: string): IMessage {
         createdAt: record.createdAt,
         sender: record.sender,
         isDeleted: record?.isDeleted || false,
+        tags: record.tags || [],
     };
 }
 
@@ -63,6 +64,7 @@ export async function postMessage(channel: ChannelID, sender: UserID, data: IMes
         sender: sender,
         createdAt: Date.now(),
         isDeleted: false,
+        tags: data.tags || [],
     };
     if (messageId) {
         await setDoc(doc(getFirestore(), _collectionPath(channel), messageId), message);

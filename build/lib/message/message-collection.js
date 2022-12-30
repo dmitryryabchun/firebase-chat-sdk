@@ -73,6 +73,7 @@ function messageRecordToChannel(record, id) {
         createdAt: record.createdAt,
         sender: record.sender,
         isDeleted: (record === null || record === void 0 ? void 0 : record.isDeleted) || false,
+        tags: record.tags || [],
     };
 }
 function postMessage(channel, sender, data, messageId) {
@@ -87,6 +88,7 @@ function postMessage(channel, sender, data, messageId) {
                         sender: sender,
                         createdAt: Date.now(),
                         isDeleted: false,
+                        tags: data.tags || [],
                     };
                     if (!messageId) return [3 /*break*/, 2];
                     return [4 /*yield*/, (0, firestore_1.setDoc)((0, firestore_1.doc)((0, firestore_1.getFirestore)(), _collectionPath(channel), messageId), message)];
