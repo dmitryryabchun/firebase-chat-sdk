@@ -318,10 +318,40 @@ export function getChannelsByIDs(ids, take) {
                 chunkPromises.push(_findByQuery(queryConstraints));
             });
             return [2 /*return*/, Promise.all(chunkPromises).then(function (data) {
+                    // @ts-ignore
                     return data.flatMap(function (chunk) { return chunk.channels; });
                 }).catch(function () {
                     return [];
                 })];
+        });
+    });
+}
+export function findMultiChannelByComposedChannels(composedIds) {
+    return __awaiter(this, void 0, void 0, function () {
+        var queryConstraints, _multiChannels;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!composedIds.length) {
+                        return [2 /*return*/, null];
+                    }
+                    queryConstraints = [
+                        limit(1000),
+                        where('isMultiChannel', '==', true),
+                        where('composedChannels', 'array-contains', composedIds[0])
+                    ];
+                    return [4 /*yield*/, _findByQuery(queryConstraints)];
+                case 1:
+                    _multiChannels = _a.sent();
+                    if (!_multiChannels.channels.length) {
+                        return [2 /*return*/, null];
+                    }
+                    return [2 /*return*/, _multiChannels.channels.find(function (ch) {
+                            var _a;
+                            return (((_a = ch.composedChannels) === null || _a === void 0 ? void 0 : _a.length) === composedIds.length &&
+                                composedIds.every(function (c) { var _a; return (_a = ch.composedChannels) === null || _a === void 0 ? void 0 : _a.includes(c); }));
+                        }) || null];
+            }
         });
     });
 }

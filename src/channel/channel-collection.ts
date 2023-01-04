@@ -226,22 +226,42 @@ export async function updateBatchPartialChannels(records: Partial<IChannelRecord
  */
 export async function getChannelsByIDs(ids: string[], take: number = 1000): Promise<IChannel[]> {
     if (!ids.length) {
-      return new Promise(exec => exec([]));
+        return new Promise(exec => exec([]));
     }
     const chunkPromises: Promise<any>[] = [];
     splitIntoChunks<string>(ids).forEach(chunkIds => {
-      const queryConstraints = [
-        limit(take),
-        where(documentId(), 'in', chunkIds),
-      ];
-      chunkPromises.push(_findByQuery(queryConstraints));
+        const queryConstraints = [
+            limit(take),
+            where(documentId(), 'in', chunkIds),
+        ];
+        chunkPromises.push(_findByQuery(queryConstraints));
     });
     return Promise.all(chunkPromises).then(data => {
-      return data.flatMap(chunk => chunk.channels);
+        // @ts-ignore
+        return data.flatMap(chunk => chunk.channels);
     }).catch(() => {
-      return [];
+        return [];
     });
-  }
+}
+
+export async function findMultiChannelByComposedChannels(composedIds: string[]): Promise<IChannel | null> {
+    if (!composedIds.length) {
+        return null;
+    }
+    const queryConstraints = [
+        limit(1000),
+        where('isMultiChannel', '==', true),
+        where('composedChannels', 'array-contains', composedIds[0])
+    ];
+    const _multiChannels = await _findByQuery(queryConstraints);
+    if (!_multiChannels.channels.length) {
+        return null;
+    }
+    return _multiChannels.channels.find(ch => (
+        ch.composedChannels?.length === composedIds!.length && 
+        composedIds!.every(c => ch.composedChannels?.includes(c))
+    )) || null;
+}
 
 async function _findByQuery(queryConstraints: QueryConstraint[]) {
     const q = query(_collectionRef(), ...queryConstraints);
