@@ -56,7 +56,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.unsubscribeChannel = exports.subscribeChannel = exports.subscribeChannels = exports.getChannelsByIDs = exports.updateBatchPartialChannels = exports.updateUserNameForEachChannel = exports.getMultiChannelWithComposedChannels = exports.getChannelWithMultiChannels = exports.findChannelsByUser = exports.findChannelsByTags = exports.getChannel = exports.createChannel = exports.batchRef = exports._docRef = void 0;
+exports.unsubscribeChannel = exports.subscribeChannel = exports.subscribeChannels = exports.findMultiChannelByComposedChannels = exports.getChannelsByIDs = exports.updateBatchPartialChannels = exports.updateUserNameForEachChannel = exports.getMultiChannelWithComposedChannels = exports.getChannelWithMultiChannels = exports.findChannelsByUser = exports.findChannelsByTags = exports.getChannel = exports.createChannel = exports.batchRef = exports._docRef = void 0;
 var firestore_1 = require("firebase/firestore");
 var firebase_snapshot_utils_1 = require("../_utils/firebase-snapshot.utils");
 var array_utils_1 = require("../_utils/array.utils");
@@ -331,6 +331,7 @@ function getChannelsByIDs(ids, take) {
                 chunkPromises.push(_findByQuery(queryConstraints));
             });
             return [2 /*return*/, Promise.all(chunkPromises).then(function (data) {
+                    // @ts-ignore
                     return data.flatMap(function (chunk) { return chunk.channels; });
                 }).catch(function () {
                     return [];
@@ -339,6 +340,36 @@ function getChannelsByIDs(ids, take) {
     });
 }
 exports.getChannelsByIDs = getChannelsByIDs;
+function findMultiChannelByComposedChannels(composedIds) {
+    return __awaiter(this, void 0, void 0, function () {
+        var queryConstraints, _multiChannels;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!composedIds.length) {
+                        return [2 /*return*/, null];
+                    }
+                    queryConstraints = [
+                        (0, firestore_1.limit)(1000),
+                        (0, firestore_1.where)('isMultiChannel', '==', true),
+                        (0, firestore_1.where)('composedChannels', 'array-contains', composedIds[0])
+                    ];
+                    return [4 /*yield*/, _findByQuery(queryConstraints)];
+                case 1:
+                    _multiChannels = _a.sent();
+                    if (!_multiChannels.channels.length) {
+                        return [2 /*return*/, null];
+                    }
+                    return [2 /*return*/, _multiChannels.channels.find(function (ch) {
+                            var _a;
+                            return (((_a = ch.composedChannels) === null || _a === void 0 ? void 0 : _a.length) === composedIds.length &&
+                                composedIds.every(function (c) { var _a; return (_a = ch.composedChannels) === null || _a === void 0 ? void 0 : _a.includes(c); }));
+                        }) || null];
+            }
+        });
+    });
+}
+exports.findMultiChannelByComposedChannels = findMultiChannelByComposedChannels;
 function _findByQuery(queryConstraints) {
     return __awaiter(this, void 0, void 0, function () {
         var q, docs;

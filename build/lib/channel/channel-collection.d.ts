@@ -33,6 +33,7 @@ export declare function updateBatchPartialChannels(records: Partial<IChannelReco
  * @returns `Promise`
  */
 export declare function getChannelsByIDs(ids: string[], take?: number): Promise<IChannel[]>;
+export declare function findMultiChannelByComposedChannels(composedIds: string[]): Promise<IChannel | null>;
 export declare function subscribeChannels(callback: (channels: IChannel[], channelData: QuerySnapshot) => void): Promise<Unsubscribe>;
 export declare function subscribeChannel(channelId: string, callback: (channelData: DocumentSnapshot) => void): Promise<Unsubscribe>;
 export declare function unsubscribeChannel(unsubscribe: Unsubscribe): Promise<void>;
