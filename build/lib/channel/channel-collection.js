@@ -56,10 +56,12 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.unsubscribeChannel = exports.subscribeChannel = exports.subscribeChannels = exports.updateBatchPartialChannels = exports.updateUserNameForEachChannel = exports.getMultiChannelWithComposedChannels = exports.getChannelWithMultiChannels = exports.findChannelsByUser = exports.findChannelsByTags = exports.getChannel = exports.createChannel = exports.batchRef = exports._docRef = void 0;
+exports.unsubscribeChannel = exports.subscribeChannel = exports.subscribeChannels = exports.getChannelsByIDs = exports.updateBatchPartialChannels = exports.updateUserNameForEachChannel = exports.getMultiChannelWithComposedChannels = exports.getChannelWithMultiChannels = exports.findChannelsByUser = exports.findChannelsByTags = exports.getChannel = exports.createChannel = exports.batchRef = exports._docRef = void 0;
 var firestore_1 = require("firebase/firestore");
 var firebase_snapshot_utils_1 = require("../_utils/firebase-snapshot.utils");
 var array_utils_1 = require("../_utils/array.utils");
+var firestore_2 = require("@firebase/firestore");
+var chunks_util_1 = require("../_utils/chunks.util");
 var _collectionPath = '/channels';
 function _collectionRef() {
     var db = (0, firestore_1.getFirestore)();
@@ -306,6 +308,37 @@ function updateBatchPartialChannels(records) {
     });
 }
 exports.updateBatchPartialChannels = updateBatchPartialChannels;
+/**
+ * Function for get channel's list by spliting into chunks
+ * @param ids An array of channel's ids
+ * @param take
+ * @returns `Promise`
+ */
+function getChannelsByIDs(ids, take) {
+    if (take === void 0) { take = 1000; }
+    return __awaiter(this, void 0, void 0, function () {
+        var chunkPromises;
+        return __generator(this, function (_a) {
+            if (!ids.length) {
+                return [2 /*return*/, new Promise(function (exec) { return exec([]); })];
+            }
+            chunkPromises = [];
+            (0, chunks_util_1.splitIntoChunks)(ids).forEach(function (chunkIds) {
+                var queryConstraints = [
+                    (0, firestore_1.limit)(take),
+                    (0, firestore_1.where)((0, firestore_2.documentId)(), 'in', chunkIds),
+                ];
+                chunkPromises.push(_findByQuery(queryConstraints));
+            });
+            return [2 /*return*/, Promise.all(chunkPromises).then(function (data) {
+                    return data.flatMap(function (chunk) { return chunk.channels; });
+                }).catch(function () {
+                    return [];
+                })];
+        });
+    });
+}
+exports.getChannelsByIDs = getChannelsByIDs;
 function _findByQuery(queryConstraints) {
     return __awaiter(this, void 0, void 0, function () {
         var q, docs;

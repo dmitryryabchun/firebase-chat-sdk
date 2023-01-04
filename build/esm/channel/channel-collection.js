@@ -57,6 +57,8 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 import { collection, doc, getDoc, getDocs, getFirestore, limit, onSnapshot, query, setDoc, startAfter, where, orderBy, writeBatch } from 'firebase/firestore';
 import { docWithId } from '../_utils/firebase-snapshot.utils';
 import { arrayToObject, objectToArray } from '../_utils/array.utils';
+import { documentId } from '@firebase/firestore';
+import { splitIntoChunks } from '../_utils/chunks.util';
 var _collectionPath = '/channels';
 function _collectionRef() {
     var db = getFirestore();
@@ -290,6 +292,36 @@ export function updateBatchPartialChannels(records) {
                     _a.sent();
                     return [2 /*return*/];
             }
+        });
+    });
+}
+/**
+ * Function for get channel's list by spliting into chunks
+ * @param ids An array of channel's ids
+ * @param take
+ * @returns `Promise`
+ */
+export function getChannelsByIDs(ids, take) {
+    if (take === void 0) { take = 1000; }
+    return __awaiter(this, void 0, void 0, function () {
+        var chunkPromises;
+        return __generator(this, function (_a) {
+            if (!ids.length) {
+                return [2 /*return*/, new Promise(function (exec) { return exec([]); })];
+            }
+            chunkPromises = [];
+            splitIntoChunks(ids).forEach(function (chunkIds) {
+                var queryConstraints = [
+                    limit(take),
+                    where(documentId(), 'in', chunkIds),
+                ];
+                chunkPromises.push(_findByQuery(queryConstraints));
+            });
+            return [2 /*return*/, Promise.all(chunkPromises).then(function (data) {
+                    return data.flatMap(function (chunk) { return chunk.channels; });
+                }).catch(function () {
+                    return [];
+                })];
         });
     });
 }

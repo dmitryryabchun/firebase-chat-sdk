@@ -23,8 +23,9 @@ import { UserID } from '../user/user.interface';
 import { arrayToObject, objectToArray } from '../_utils/array.utils';
 import firebase from 'firebase/compat';
 import Unsubscribe = firebase.Unsubscribe;
-import { DocumentData, WriteBatch } from '@firebase/firestore';
+import { DocumentData, documentId, WriteBatch } from '@firebase/firestore';
 import { IChannelLastMessage } from '../message/message.interface';
+import { splitIntoChunks } from '../_utils/chunks.util';
 
 const _collectionPath = '/channels';
 
@@ -216,6 +217,31 @@ export async function updateBatchPartialChannels(records: Partial<IChannelRecord
     });
     await batch.commit();
 }
+
+/**
+ * Function for get channel's list by spliting into chunks
+ * @param ids An array of channel's ids
+ * @param take
+ * @returns `Promise`
+ */
+export async function getChannelsByIDs(ids: string[], take: number = 1000): Promise<IChannel[]> {
+    if (!ids.length) {
+      return new Promise(exec => exec([]));
+    }
+    const chunkPromises: Promise<any>[] = [];
+    splitIntoChunks<string>(ids).forEach(chunkIds => {
+      const queryConstraints = [
+        limit(take),
+        where(documentId(), 'in', chunkIds),
+      ];
+      chunkPromises.push(_findByQuery(queryConstraints));
+    });
+    return Promise.all(chunkPromises).then(data => {
+      return data.flatMap(chunk => chunk.channels);
+    }).catch(() => {
+      return [];
+    });
+  }
 
 async function _findByQuery(queryConstraints: QueryConstraint[]) {
     const q = query(_collectionRef(), ...queryConstraints);

@@ -13,6 +13,7 @@ export {
     getChannelWithMultiChannels, 
     getMultiChannelWithComposedChannels, 
     updateBatchPartialChannels, 
-    updateUserNameForEachChannel 
+    updateUserNameForEachChannel,
+    getChannelsByIDs
 } from './channel/channel-collection';
 export { postMessage, getMessages, subscribeMessage, unsubscribeMessage, updateMessage } from './message/message-collection';
