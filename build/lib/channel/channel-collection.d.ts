@@ -26,6 +26,13 @@ export declare function updateUserNameForEachChannel(id: UserID, name: string, t
  * @returns `Promise`
  */
 export declare function updateBatchPartialChannels(records: Partial<IChannelRecord>[]): Promise<void>;
+/**
+ * Function for get channel's list by spliting into chunks
+ * @param ids An array of channel's ids
+ * @param take
+ * @returns `Promise`
+ */
+export declare function getChannelsByIDs(ids: string[], take?: number): Promise<IChannel[]>;
 export declare function subscribeChannels(callback: (channels: IChannel[], channelData: QuerySnapshot) => void): Promise<Unsubscribe>;
 export declare function subscribeChannel(channelId: string, callback: (channelData: DocumentSnapshot) => void): Promise<Unsubscribe>;
 export declare function unsubscribeChannel(unsubscribe: Unsubscribe): Promise<void>;
